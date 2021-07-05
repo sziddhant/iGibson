@@ -4,8 +4,8 @@ import numpy as np
 
 
 def main():
-    s = Simulator(mode='gui', image_width=512,
-                  image_height=512, device_idx=0)
+    s = Simulator(mode='gui', image_width=256,
+                  image_height=256, device_idx=0)
     scene = InteractiveIndoorScene(
         'Rs_int', texture_randomization=False, object_randomization=False)
     s.import_ig_scene(scene)

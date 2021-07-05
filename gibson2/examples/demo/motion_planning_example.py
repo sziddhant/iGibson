@@ -13,7 +13,7 @@ def run_example(args):
 
     motion_planner = MotionPlanningWrapper(nav_env)
     state = nav_env.reset()
-
+    
     while True:
         action = np.zeros(nav_env.action_space.shape)
         state, reward, done, _ = nav_env.step(action)

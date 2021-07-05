@@ -29,6 +29,7 @@ load_object_categories: [
   fridge,
   microwave,
   oven,
+  door,
   washer
   dryer,
 ]
