@@ -28,7 +28,7 @@ def main():
         trav_map[obstacle_map == 0] = 0
         trav_map = cv2.erode(trav_map, np.ones((trav_map_erosion, trav_map_erosion)))
         plt.figure(f, figsize=(12, 12))
-        plt.imshow(trav_map)
+        plt.imshow(obstacle_map)
 
     plt.show()
 

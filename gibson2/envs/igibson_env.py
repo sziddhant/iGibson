@@ -117,6 +117,7 @@ class iGibsonEnv(BaseEnv):
         self.output = self.config['output']
         self.image_width = self.config.get('image_width', 128)
         self.image_height = self.config.get('image_height', 128)
+        observation_space2 = np.zeros((512,512,3))
         observation_space = OrderedDict()
         sensors = OrderedDict()
         vision_modalities = []
@@ -127,7 +128,7 @@ class iGibsonEnv(BaseEnv):
                 shape=(self.task.task_obs_dim,), low=-np.inf, high=-np.inf)
         if 'rgb' in self.output:
             observation_space['rgb'] = self.build_obs_space(
-                shape=(self.image_height, self.image_width, 3),
+                shape=(self.image_height, self.image_width, 4),
                 low=0.0, high=1.0)
             vision_modalities.append('rgb')
         if 'depth' in self.output:
@@ -193,8 +194,9 @@ class iGibsonEnv(BaseEnv):
 
         if len(scan_modalities) > 0:
             sensors['scan_occ'] = ScanSensor(self, scan_modalities)
+        # print(observation_space['rgb'].shape)
 
-        self.observation_space = gym.spaces.Dict(observation_space)
+        self.observation_space = observation_space['rgb'] #gym.spaces.MultiBinary(observation_space2) #gym.spaces.Dict(observation_space)
         self.sensors = sensors
 
     def load_action_space(self):
@@ -243,6 +245,11 @@ class iGibsonEnv(BaseEnv):
         if 'bump' in self.sensors:
             state['bump'] = self.sensors['bump'].get_obs(self)
 
+        # print(state.keys())
+        rgb= np.concatenate([state['rgb'],state['depth']],axis=2)
+        # print(rgb.shape)
+        
+        return rgb
         return state
 
     def run_simulation(self):
@@ -307,6 +314,7 @@ class iGibsonEnv(BaseEnv):
 
         state = self.get_state(collision_links)
         info = {}
+        done = False
         reward, info = self.task.get_reward(
             self, collision_links, action, info)
         done, info = self.task.get_termination(
@@ -317,7 +325,7 @@ class iGibsonEnv(BaseEnv):
         if done and self.automatic_reset:
             info['last_observation'] = state
             state = self.reset()
-
+        done = bool(done)
         return state, reward, done, info
 
     def check_collision(self, body_id):
@@ -450,6 +458,7 @@ class iGibsonEnv(BaseEnv):
         self.task.reset_agent(self)
         self.simulator.sync()
         state = self.get_state()
+        # print(state.shape)
         self.reset_variables()
 
         return state
